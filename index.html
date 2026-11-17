@@ -58,6 +58,52 @@ works.forEach(([year,song,artist,kind,img,producer,link,genre,extra])=>{
  tile.addEventListener('click',open);tile.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();open()}});
  grid.appendChild(tile);
 });
+
+// Carrega também os trabalhos cadastrados no painel administrativo (Supabase).
+(async function loadAdminProjects(){
+  const SUPABASE_URL = 'https://vezlqqhwyubaloatyijz.supabase.co';
+  const SUPABASE_KEY = 'sb_publishable_nuHxi77JwWEw2r7PNnZ_rA_tueYJKHh';
+  try {
+    const response = await fetch(`${SUPABASE_URL}/rest/v1/projects?select=*&order=created_at.asc`, {
+      headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}` }
+    });
+    if (!response.ok) throw new Error(`Supabase respondeu ${response.status}: ${await response.text()}`);
+    const projects = await response.json();
+    const grid = document.getElementById('grid');
+    projects.forEach(project => {
+      const title = project.title || 'Sem título';
+      const artist = project.artist || 'Artista não informado';
+      const cover = project.cover_url || '';
+      const description = project.description || '';
+      const audio = project.audio_url || '#';
+      const tile = document.createElement('article');
+      tile.className = 'tile'; tile.tabIndex = 0;
+      tile.innerHTML = `<img loading="lazy" src="${cover}" alt="Capa de ${title.replace(/[&<>"']/g, '')}"><div class="info"><div class="year">NOVO</div><div class="song"></div><div class="artist"></div><div class="kind">SINGLE</div></div>`;
+      tile.querySelector('.song').textContent = title;
+      tile.querySelector('.artist').textContent = artist;
+      const open = () => {
+        document.getElementById('modalYear').textContent = 'NOVO';
+        document.getElementById('modalSong').textContent = title;
+        document.getElementById('modalArtist').textContent = artist;
+        document.getElementById('modalKind').textContent = 'SINGLE';
+        document.getElementById('modalGenre').textContent = description;
+        document.getElementById('modalProducer').textContent = '';
+        document.getElementById('modalCredit').textContent = 'Mixagem e masterização: Rony Silva';
+        document.getElementById('modalExtra').innerHTML = '';
+        const link = document.getElementById('modalLink');
+        link.href = audio; link.style.display = audio === '#' ? 'none' : 'inline';
+        link.textContent = 'OUVIR ↗';
+        document.getElementById('workModal').showModal();
+      };
+      tile.addEventListener('click', open);
+      tile.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(); } });
+      grid.appendChild(tile);
+    });
+    console.info(`Supabase: ${projects.length} trabalho(s) carregado(s).`);
+  } catch (error) {
+    console.error('Não foi possível carregar os trabalhos do painel:', error);
+  }
+})();
 </script>
 <dialog id="workModal"><button class="close" aria-label="Fechar" onclick="this.closest('dialog').close()">×</button><div class="modal-year" id="modalYear"></div><h2 class="modal-title" id="modalSong"></h2><div class="modal-artist" id="modalArtist"></div><div class="modal-kind" id="modalKind"></div><p id="modalGenre" style="color:#aaa;font-size:12px;margin-top:10px"></p><p id="modalProducer" style="color:#aaa;font-size:12px;margin-top:18px"></p><p id="modalCredit" style="color:#aaa;font-size:12px;margin-top:10px"></p><div id="modalExtra"></div><p style="margin-top:22px"><a id="modalLink" href="#" target="_blank" rel="noopener" style="color:#d6c9a8;text-decoration:none;letter-spacing:.12em;font-size:11px">OUVIR NO YOUTUBE ↗</a></p></dialog>
 </body></html>
