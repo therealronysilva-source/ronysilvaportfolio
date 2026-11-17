@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#090a0c">
+<title>Rony Silva — Mix & Mastering</title>
+<style>
+:root{--bg:#090a0c;--ink:#f3f0e9;--muted:#9b9a97;--line:#292a2d;--gold:#b9a477}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--bg);color:var(--ink);font-family:Arial,Helvetica,sans-serif}
+header{height:148px;display:flex;align-items:center;justify-content:center;position:relative;border-bottom:1px solid #17181a;background:linear-gradient(180deg,#111316,#090a0c)}
+.brand{text-align:center}.brand h1{font-size:clamp(25px,4vw,43px);font-weight:300;letter-spacing:.34em;margin:0 0 9px 0;padding-left:.34em}.brand p{font-size:11px;letter-spacing:.48em;color:#c5c1b8;margin:0;padding-left:.48em}
+.menu{position:absolute;right:34px;top:48px;background:none;border:0;color:#eee;font-size:27px;cursor:pointer}
+.intro{text-align:center;padding:48px 20px 34px}.intro h2{font-size:clamp(17px,2vw,25px);font-weight:300;letter-spacing:.32em;margin:0 0 17px;padding-left:.32em}.intro .down{font-size:28px;color:#aaa}
+.grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:3px;padding:0 3px 45px}
+.tile{position:relative;aspect-ratio:1/1;overflow:hidden;background:#191b20;cursor:pointer;isolation:isolate}
+.tile img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .65s cubic-bezier(.2,.7,.2,1),filter .5s;filter:saturate(.8)}
+.tile:after{content:"";position:absolute;inset:0;background:linear-gradient(0deg,rgba(0,0,0,.83),rgba(0,0,0,.05) 72%);opacity:0;transition:opacity .35s;z-index:1}
+.info{position:absolute;left:8%;right:7%;bottom:9%;z-index:2;opacity:0;transform:translateY(10px);transition:.35s}
+.year{font-size:12px;letter-spacing:.12em;color:#d6c9a8}.song{font-size:clamp(13px,1.35vw,19px);font-weight:700;line-height:1.15;margin:15px 0 6px;text-transform:uppercase}.artist{font-size:12px;letter-spacing:.07em}.kind{font-size:9px;color:#c8c3b8;letter-spacing:.22em;margin-top:15px;text-transform:uppercase}
+.tile:hover img,.tile:focus-visible img{transform:scale(1.055);filter:saturate(1.05)}.tile:hover:after,.tile:focus-visible:after{opacity:1}.tile:hover .info,.tile:focus-visible .info{opacity:1;transform:translateY(0)}
+footer{border-top:1px solid var(--line);padding:35px 20px 45px;text-align:center;color:var(--muted);font-size:10px;letter-spacing:.22em}
+.note{text-align:center;color:#777;font-size:10px;letter-spacing:.08em;padding:0 20px 30px}
+dialog{border:1px solid #48433a;background:#101114;color:var(--ink);padding:30px;max-width:440px;width:calc(100% - 36px)}dialog::backdrop{background:#000b}.close{float:right;border:0;background:none;color:white;font-size:22px;cursor:pointer}.modal-year{color:var(--gold);letter-spacing:.15em;font-size:12px}.modal-title{font-size:26px;margin:12px 0 7px}.modal-artist{color:#c9c5bc}.modal-kind{font-size:10px;letter-spacing:.2em;color:#999;margin-top:18px}
+@media(max-width:900px){.grid{grid-template-columns:repeat(4,minmax(0,1fr))}}
+@media(max-width:620px){header{height:120px}.menu{right:17px;top:39px}.grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:2px}.intro{padding-top:38px}.info{opacity:1;transform:none}.tile:after{opacity:.55}.song{font-size:15px}}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand"><h1>RONY SILVA</h1><p>MIX &amp; MASTERING</p></div>
+  <button class="menu" aria-label="Abrir informações" onclick="document.getElementById('about').showModal()">☰</button>
+</header>
+<section class="intro"><h2>SELECTED DISCOGRAPHY</h2><div class="down">⌄</div></section>
+<main class="grid" id="grid" aria-label="Discografia selecionada"></main>
+<p class="note">PORTFÓLIO CONCEITUAL · CAPAS E CRÉDITOS FICTÍCIOS PARA DEMONSTRAÇÃO</p>
+<footer>RONY SILVA &nbsp;·&nbsp; MIXING &amp; MASTERING</footer>
+<dialog id="about"><button class="close" aria-label="Fechar" onclick="this.closest('dialog').close()">×</button><div class="modal-year">AUDIO ENGINEER · BRAZIL</div><h2 class="modal-title">Rony Silva</h2><p class="modal-artist">Mixagem &amp; masterização</p><p style="color:#aaa;line-height:1.6">Portfólio em construção. Em breve, trabalhos reais, créditos e links para ouvir.</p><div class="modal-kind">CONTATO · SEUS LINKS ENTRARÃO AQUI</div></dialog>
+<script>
+const works=[
+ ["2026","NOITE INTEIRA","ARTISTA EXEMPLO","SINGLE","photo-1516280440614-37939bbacd81"],
+ ["2025","ENTRE AS SOMBRAS","PROJETO FICTÍCIO","ÁLBUM","photo-1500530855697-b586d89ba3ee"],
+ ["2025","SEM SINAL","ARTISTA EXEMPLO","SINGLE","photo-1519608487953-e999c86e7455"],
+ ["2026","LINHA DE FRENTE","ARTISTA EXEMPLO","SINGLE","photo-1506157786151-b8491531f063"],
+ ["2024","DEPOIS DA CHUVA","PROJETO FICTÍCIO","EP","photo-1518837695005-2083093ee35b"],
+ ["2025","LUZES DA CIDADE","ARTISTA EXEMPLO","SINGLE","photo-1519608487953-e999c86e7455"],
+ ["2024","PESO DO MUNDO","PROJETO FICTÍCIO","ÁLBUM","photo-1511379938547-c1f69419868d"],
+ ["2026","OUTRO LADO","ARTISTA EXEMPLO","SINGLE","photo-1492684223066-81342ee5ff30"],
+ ["2025","SEM MEDO","PROJETO FICTÍCIO","EP","photo-1500534623283-312aade485b7"],
+ ["2024","NOITE AZUL","ARTISTA EXEMPLO","SINGLE","photo-1470225620780-dba8ba36b745"],
+ ["2026","MARÉ CHEIA","PROJETO FICTÍCIO","SINGLE","photo-1500375592092-40eb2168fd21"],
+ ["2025","RETRATO","ARTISTA EXEMPLO","ÁLBUM","photo-1506794778202-cad84cf45f1d"],
+ ["2024","CORAÇÃO DE AÇO","PROJETO FICTÍCIO","EP","photo-1519681393784-d120267933ba"],
+ ["2026","FREQUÊNCIA","ARTISTA EXEMPLO","SINGLE","photo-1519608487953-e999c86e7455"],
+ ["2025","ÚLTIMO VERÃO","PROJETO FICTÍCIO","SINGLE","photo-1470252649378-9c29740c9fa8"]
+];
+const grid=document.getElementById('grid');
+works.forEach(([year,song,artist,kind,img])=>{
+ const tile=document.createElement('article');tile.className='tile';tile.tabIndex=0;
+ tile.innerHTML=`<img loading="lazy" src="https://images.unsplash.com/${img}?auto=format&fit=crop&w=700&q=82" alt="Capa conceitual fictícia para ${song}"><div class="info"><div class="year">${year}</div><div class="song">${song}</div><div class="artist">${artist}</div><div class="kind">${kind}</div></div>`;
+ const open=()=>{document.getElementById('modalYear').textContent=year;document.getElementById('modalSong').textContent=song;document.getElementById('modalArtist').textContent=artist;document.getElementById('modalKind').textContent=kind;document.getElementById('workModal').showModal()};
+ tile.addEventListener('click',open);tile.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();open()}});
+ grid.appendChild(tile);
+});
+</script>
+<dialog id="workModal"><button class="close" aria-label="Fechar" onclick="this.closest('dialog').close()">×</button><div class="modal-year" id="modalYear"></div><h2 class="modal-title" id="modalSong"></h2><div class="modal-artist" id="modalArtist"></div><div class="modal-kind" id="modalKind"></div><p style="color:#aaa;font-size:12px;margin-top:24px">Crédito demonstrativo fictício — substituiremos pelos seus trabalhos reais.</p></dialog>
+</body></html>
