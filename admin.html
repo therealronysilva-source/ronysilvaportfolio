@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#090a0c"><title>Painel | Rony Silva</title>
+<style>
+:root{--bg:#090a0c;--panel:#121418;--ink:#f3f0e9;--muted:#a5a39d;--line:#303238;--gold:#b9a477;--green:#315f49;--red:#7c3434}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px Arial,Helvetica,sans-serif}header{padding:25px max(22px,calc((100% - 1050px)/2));border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center}header strong{letter-spacing:.2em;font-weight:500}main{max-width:1050px;margin:38px auto;padding:0 20px}.sub{color:var(--muted);margin-top:7px}.panel{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:24px;margin:22px 0}.login{max-width:480px;margin:70px auto}.hidden{display:none!important}h1{font-size:25px;font-weight:400;margin:0}h2{font-size:19px;font-weight:500;margin:0 0 20px}label{display:block;font-size:13px;color:#d3d0c8;margin:14px 0 7px}input,textarea{width:100%;background:#0b0d10;color:var(--ink);border:1px solid #42454b;border-radius:7px;padding:12px;font:inherit}textarea{min-height:90px;resize:vertical}input[type=file]{padding:9px}button{background:var(--gold);color:#111;border:0;border-radius:7px;padding:11px 17px;font-weight:700;cursor:pointer;margin-top:16px}button.secondary{background:#292c31;color:var(--ink);border:1px solid #45484e}button.danger{background:#572929;color:#fff}button:disabled{opacity:.55;cursor:wait}.row{display:grid;grid-template-columns:1fr 1fr;gap:14px}.status{color:var(--muted);min-height:22px;margin-top:14px;font-size:13px}.work{display:flex;gap:15px;align-items:center;border-top:1px solid var(--line);padding:14px 0}.work img{width:72px;height:72px;object-fit:cover;border-radius:5px;background:#24262b}.work-info{flex:1;min-width:0}.work-info strong{display:block}.work-info small{color:var(--muted)}.work-actions{display:flex;gap:7px;flex-wrap:wrap}.work-actions button{margin:0;padding:8px 11px;font-size:12px}.topline{display:flex;justify-content:space-between;align-items:center;gap:12px}.hint{font-size:12px;color:var(--muted);line-height:1.5}.preview{width:90px;height:90px;object-fit:cover;margin-top:10px;display:none;border-radius:6px}@media(max-width:620px){.row{grid-template-columns:1fr}.panel{padding:17px}.work{align-items:flex-start}.work img{width:58px;height:58px}.work-actions{flex-direction:column}}
+</style>
+</head>
+<body>
+<header><strong>RONY SILVA <span style="color:var(--gold)">·</span> PAINEL</strong><button id="logout" class="secondary hidden" style="margin:0">Sair</button></header>
+<main>
+<section id="loginBox" class="panel login"><h1>Acesso administrativo</h1><p class="sub">Entre para gerenciar seu portfólio.</p><form id="loginForm"><label>E-mail</label><input id="email" type="email" autocomplete="username" required><label>Senha</label><input id="password" type="password" autocomplete="current-password" required><button id="loginBtn" type="submit">Entrar</button></form><div id="loginStatus" class="status"></div></section>
+<section id="app" class="hidden">
+<div class="topline"><div><h1>Seus trabalhos</h1><p class="sub">Adicione, edite ou remova projetos do portfólio.</p></div></div>
+<section class="panel"><h2 id="formTitle">Adicionar novo trabalho</h2><form id="projectForm">
+<div class="row"><div><label>Nome da música *</label><input id="title" required maxlength="120" placeholder="Ex.: Meu Chá"></div><div><label>Artista *</label><input id="artist" required maxlength="120" placeholder="Ex.: Alondra Rojas"></div></div>
+<label>Descrição</label><textarea id="description" maxlength="1000" placeholder="Créditos, estilo, ano ou detalhes do trabalho..."></textarea>
+<div class="row"><div><label>Capa da música *</label><input id="cover" type="file" accept="image/jpeg,image/png,image/webp"><img id="coverPreview" class="preview" alt="Prévia da capa"></div><div><label>Link do áudio (opcional)</label><input id="audio" type="url" placeholder="https://..."><p class="hint">Cole um link público do áudio. O envio de arquivos de áudio ficará para uma próxima etapa.</p></div></div>
+<button id="saveBtn" type="submit">Salvar trabalho</button> <button id="cancelEdit" type="button" class="secondary hidden">Cancelar edição</button><div id="formStatus" class="status"></div>
+</form></section>
+<section class="panel"><h2>Trabalhos cadastrados</h2><div id="projectList"><p class="sub">Carregando...</p></div></section>
+</section>
+</main>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+// Configuração pública do projeto Supabase. Nunca coloque uma secret/service_role key aqui.
+const SUPABASE_URL = 'https://vezlqghwyubaloatyjiz.supabase.co';
+const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_nuHxi777JwWEw2r7PNnZ_rA_tueYJKHh';
+const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
+const $ = id => document.getElementById(id);
+let editingId = null;
+function status(id,msg){$(id).textContent=msg;}
+function safeName(name){return name.normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-zA-Z0-9._-]/g,'-');}
+async function uploadFile(file,folder){if(!file)return null;const path=`${folder}/${Date.now()}-${safeName(file.name)}`;const {error}=await db.storage.from('covers').upload(path,file,{upsert:false,contentType:file.type||undefined});if(error)throw error;const {data}=db.storage.from('covers').getPublicUrl(path);return data.publicUrl;}
+function showApp(user){$('loginBox').classList.add('hidden');$('app').classList.remove('hidden');$('logout').classList.remove('hidden');loadProjects();}
+async function checkSession(){const {data:{session}}=await db.auth.getSession();if(session)showApp(session.user);}
+$('loginForm').addEventListener('submit',async e=>{e.preventDefault();$('loginBtn').disabled=true;status('loginStatus','Entrando...');const {error}=await db.auth.signInWithPassword({email:$('email').value.trim(),password:$('password').value});$('loginBtn').disabled=false;if(error){status('loginStatus','Não foi possível entrar: '+error.message);return;}status('loginStatus','');const {data:{session}}=await db.auth.getSession();showApp(session.user);});
+$('logout').addEventListener('click',async()=>{await db.auth.signOut();location.reload();});
+async function loadProjects(){const box=$('projectList');box.textContent='Carregando...';const {data,error}=await db.from('projects').select('*').order('created_at',{ascending:false});if(error){box.textContent='Erro ao carregar: '+error.message;return;}box.replaceChildren();if(!data.length){box.textContent='Ainda não há trabalhos cadastrados.';return;}for(const p of data){const item=document.createElement('div');item.className='work';const img=document.createElement('img');img.src=p.cover_url||'';img.alt='Capa';const info=document.createElement('div');info.className='work-info';const title=document.createElement('strong');title.textContent=p.title||'Sem título';const artist=document.createElement('small');artist.textContent=p.artist||'';info.append(title,artist);const actions=document.createElement('div');actions.className='work-actions';const edit=document.createElement('button');edit.className='secondary';edit.textContent='Editar';edit.onclick=()=>editProject(p);const del=document.createElement('button');del.className='danger';del.textContent='Excluir';del.onclick=()=>deleteProject(p);actions.append(edit,del);item.append(img,info,actions);box.append(item);}}
+function editProject(p){editingId=p.id;$('formTitle').textContent='Editar trabalho';$('title').value=p.title||'';$('artist').value=p.artist||'';$('description').value=p.description||'';$('cover').required=false;$('audio').required=false;$('coverPreview').src=p.cover_url||'';$('coverPreview').style.display=p.cover_url?'block':'none';$('saveBtn').textContent='Salvar alterações';$('cancelEdit').classList.remove('hidden');window.scrollTo({top:0,behavior:'smooth'});}
+function resetForm(){$('projectForm').reset();editingId=null;$('formTitle').textContent='Adicionar novo trabalho';$('cover').required=true;$('coverPreview').style.display='none';$('saveBtn').textContent='Salvar trabalho';$('cancelEdit').classList.add('hidden');status('formStatus','');}
+$('cancelEdit').addEventListener('click',resetForm);
+$('cover').addEventListener('change',()=>{const f=$('cover').files[0];if(f){$('coverPreview').src=URL.createObjectURL(f);$('coverPreview').style.display='block';}});
+$('projectForm').addEventListener('submit',async e=>{e.preventDefault();$('saveBtn').disabled=true;status('formStatus','Enviando arquivos e salvando...');try{const payload={title:$('title').value.trim(),artist:$('artist').value.trim(),description:$('description').value.trim()};const coverFile=$('cover').files[0];const audioUrl=$('audio').value.trim();if(coverFile)payload.cover_url=await uploadFile(coverFile,'covers');else if(!editingId)throw new Error('Escolha uma capa para o trabalho.');if(audioUrl)payload.audio_url=audioUrl;let result;if(editingId)result=await db.from('projects').update(payload).eq('id',editingId);else result=await db.from('projects').insert(payload);if(result.error)throw result.error;status('formStatus','Trabalho salvo com sucesso!');resetForm();await loadProjects();}catch(err){status('formStatus','Erro: '+(err.message||'Não foi possível salvar.'));}finally{$('saveBtn').disabled=false;}});
+async function deleteProject(p){if(!confirm(`Excluir “${p.title}”? Essa ação não pode ser desfeita.`))return;const {error}=await db.from('projects').delete().eq('id',p.id);if(error){alert('Erro ao excluir: '+error.message);return;}loadProjects();}
+checkSession();
+</script>
+</body></html>
