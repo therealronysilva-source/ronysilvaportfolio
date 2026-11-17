@@ -12,9 +12,12 @@ header{height:148px;display:flex;align-items:center;justify-content:center;posit
 .brand{text-align:center}.brand h1{font-size:clamp(25px,4vw,43px);font-weight:300;letter-spacing:.34em;margin:0 0 9px 0;padding-left:.34em}.brand p{font-size:11px;letter-spacing:.48em;color:#c5c1b8;margin:0;padding-left:.48em}
 .menu{position:absolute;right:34px;top:48px;background:none;border:0;color:#eee;font-size:27px;cursor:pointer}
 .intro{text-align:center;padding:48px 20px 34px}.intro h2{font-size:clamp(17px,2vw,25px);font-weight:300;letter-spacing:.32em;margin:0 0 17px;padding-left:.32em}.intro .down{font-size:28px;color:#aaa}
-.grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:3px;padding:0 3px 45px}
+.grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:3px;padding:0 3px 45px}
 .tile{position:relative;aspect-ratio:1/1;overflow:hidden;background:#191b20;cursor:pointer;isolation:isolate}
 .tile img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .65s cubic-bezier(.2,.7,.2,1),filter .5s;filter:saturate(.8)}
+/* Ajuste exclusivo da quarta capa: amplia a arte que estava com margem interna, sem alterar o arquivo da foto ou o quadrado */
+.grid .tile:nth-child(4) img{transform:scale(1.105)}
+.grid .tile:nth-child(4):hover img,.grid .tile:nth-child(4):focus-visible img{transform:scale(1.16)}
 .tile:after{content:"";position:absolute;inset:0;background:linear-gradient(0deg,rgba(0,0,0,.83),rgba(0,0,0,.05) 72%);opacity:0;transition:opacity .35s;z-index:1}
 .info{position:absolute;left:8%;right:7%;bottom:9%;z-index:2;opacity:0;transform:translateY(10px);transition:.35s}
 .year{font-size:12px;letter-spacing:.12em;color:#d6c9a8}.song{font-size:clamp(13px,1.35vw,19px);font-weight:700;line-height:1.15;margin:15px 0 6px;text-transform:uppercase}.artist{font-size:12px;letter-spacing:.07em}.kind{font-size:9px;color:#c8c3b8;letter-spacing:.22em;margin-top:15px;text-transform:uppercase}
