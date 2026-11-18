@@ -21,10 +21,15 @@ header{height:148px;display:flex;align-items:center;justify-content:center;posit
 .tile:after{content:"";position:absolute;inset:0;background:linear-gradient(0deg,rgba(0,0,0,.83),rgba(0,0,0,.05) 72%);opacity:0;transition:opacity .35s;z-index:1}
 .info{position:absolute;left:8%;right:7%;bottom:9%;z-index:2;opacity:0;transform:translateY(10px);transition:.35s}
 .year{font-size:12px;letter-spacing:.12em;color:#d6c9a8}.song{font-size:clamp(13px,1.35vw,19px);font-weight:700;line-height:1.15;margin:15px 0 6px;text-transform:uppercase}.artist{font-size:12px;letter-spacing:.07em}.kind{font-size:9px;color:#c8c3b8;letter-spacing:.22em;margin-top:15px;text-transform:uppercase}
-.tile:hover img,.tile:focus-visible img{transform:scale(1.055);filter:saturate(1.05)}.tile:hover:after,.tile:focus-visible:after{opacity:1}.tile:hover .info,.tile:focus-visible .info{opacity:1;transform:translateY(0)}
+.tile:hover img,.tile:focus-visible img{transform:scale(1.055);filter:saturate(1.05)}
+/* Capas novas: compensam a margem interna da imagem enviada pelo painel */
+.tile.new-tile img{transform:scale(1.10)}
+.tile.new-tile:hover img,.tile.new-tile:focus-visible img{transform:scale(1.15)}
+.tile:hover:after,.tile:focus-visible:after{opacity:1}.tile:hover .info,.tile:focus-visible .info{opacity:1;transform:translateY(0)}
 footer{border-top:1px solid var(--line);padding:35px 20px 45px;text-align:center;color:var(--muted);font-size:10px;letter-spacing:.22em}
 .note{text-align:center;color:#777;font-size:10px;letter-spacing:.08em;padding:0 20px 30px}
 dialog{border:1px solid #48433a;background:#101114;color:var(--ink);padding:30px;max-width:440px;width:calc(100% - 36px)}dialog::backdrop{background:#000b}.close{float:right;border:0;background:none;color:white;font-size:22px;cursor:pointer}.modal-year{color:var(--gold);letter-spacing:.15em;font-size:12px}.modal-title{font-size:26px;margin:12px 0 7px}.modal-artist{color:#c9c5bc}.modal-kind{font-size:10px;letter-spacing:.2em;color:#999;margin-top:18px}
+#modalGenre{white-space:pre-line;line-height:1.65}.modal-details{margin-top:14px;display:grid;gap:9px}.modal-detail{font-size:12px;line-height:1.5;color:#aaa}.modal-detail strong{color:#f3f0e9;font-weight:700}.modal-description{white-space:pre-line;color:#aaa;font-size:12px;line-height:1.65;margin-top:14px}
 @media(max-width:900px){.grid{grid-template-columns:repeat(4,minmax(0,1fr))}}
 @media(max-width:620px){header{height:120px}.menu{right:17px;top:39px}.grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:2px}.intro{padding-top:38px}.info{opacity:1;transform:none}.tile:after{opacity:.55}.song{font-size:15px}}
 </style>
@@ -54,7 +59,7 @@ const grid=document.getElementById('grid');
 works.forEach(([year,song,artist,kind,img,producer,link,genre,extra])=>{
  const tile=document.createElement('article');tile.className='tile';tile.tabIndex=0;
  tile.innerHTML=`<img loading="lazy" src="${img}" alt="Capa enviada para ${song}"><div class="info"><div class="year">${year}</div><div class="song">${song}</div><div class="artist">${artist}</div><div class="kind">${kind}</div></div>`;
- const open=()=>{document.getElementById('modalYear').textContent=year;document.getElementById('modalSong').textContent=song;document.getElementById('modalArtist').textContent=artist;document.getElementById('modalKind').textContent=kind;document.getElementById('modalGenre').textContent='Gênero musical: '+genre;document.getElementById('modalProducer').textContent='Produção: '+producer;document.getElementById('modalCredit').textContent='Mixagem e masterização: Rony Silva';document.getElementById('modalExtra').innerHTML=extra?extra.map(x=>`<p style="color:#aaa;font-size:12px;margin:8px 0">${x}</p>`).join(''):'';document.getElementById('modalLink').href=link;document.getElementById('modalLink').textContent=link.includes('spotify.com')?'OUVIR NO SPOTIFY ↗':(kind==='ALBUM'?'OUVIR ÁLBUM NO YOUTUBE ↗':'OUVIR NO YOUTUBE ↗');document.getElementById('workModal').showModal()};
+ const open=()=>{document.getElementById('modalYear').textContent=year;document.getElementById('modalSong').textContent=song;document.getElementById('modalArtist').textContent=artist;document.getElementById('modalKind').textContent=kind;document.getElementById('modalGenre').textContent='Gênero musical: '+genre;document.getElementById('modalProducer').textContent='Produção: '+producer;document.getElementById('modalCredit').textContent='Mixagem e masterização: Rony Silva';document.getElementById('modalStructured').replaceChildren();document.getElementById('modalDescription').textContent='';document.getElementById('modalDescription').style.display='none';document.getElementById('modalExtra').innerHTML=extra?extra.map(x=>`<p style="color:#aaa;font-size:12px;margin:8px 0">${x}</p>`).join(''):'';document.getElementById('modalLink').href=link;document.getElementById('modalLink').textContent=link.includes('spotify.com')?'OUVIR NO SPOTIFY ↗':(kind==='ALBUM'?'OUVIR ÁLBUM NO YOUTUBE ↗':'OUVIR NO YOUTUBE ↗');document.getElementById('workModal').showModal()};
  tile.addEventListener('click',open);tile.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();open()}});
  grid.appendChild(tile);
 });
@@ -74,25 +79,43 @@ works.forEach(([year,song,artist,kind,img,producer,link,genre,extra])=>{
       const title = project.title || 'Sem título';
       const artist = project.artist || 'Artista não informado';
       const cover = project.cover_url || '';
-      const description = project.description || '';
       const audio = project.audio_url || '#';
+      const year = project.release_year ? String(project.release_year) : 'NOVO';
+      const kind = project.project_type || 'SINGLE';
       const tile = document.createElement('article');
-      tile.className = 'tile'; tile.tabIndex = 0;
-      tile.innerHTML = `<img loading="lazy" src="${cover}" alt="Capa de ${title.replace(/[&<>"']/g, '')}"><div class="info"><div class="year">NOVO</div><div class="song"></div><div class="artist"></div><div class="kind">SINGLE</div></div>`;
-      tile.querySelector('.song').textContent = title;
-      tile.querySelector('.artist').textContent = artist;
+      tile.className = 'tile new-tile'; tile.tabIndex = 0;
+      const img = document.createElement('img'); img.loading = 'lazy'; img.src = cover; img.alt = `Capa de ${title}`;
+      const info = document.createElement('div'); info.className = 'info';
+      const yearEl = document.createElement('div'); yearEl.className = 'year'; yearEl.textContent = year;
+      const songEl = document.createElement('div'); songEl.className = 'song'; songEl.textContent = title;
+      const artistEl = document.createElement('div'); artistEl.className = 'artist'; artistEl.textContent = artist;
+      const kindEl = document.createElement('div'); kindEl.className = 'kind'; kindEl.textContent = kind;
+      info.append(yearEl,songEl,artistEl,kindEl); tile.append(img,info);
       const open = () => {
-        document.getElementById('modalYear').textContent = 'NOVO';
+        document.getElementById('modalYear').textContent = year;
         document.getElementById('modalSong').textContent = title;
         document.getElementById('modalArtist').textContent = artist;
-        document.getElementById('modalKind').textContent = 'SINGLE';
-        document.getElementById('modalGenre').textContent = description;
+        document.getElementById('modalKind').textContent = kind;
+        document.getElementById('modalGenre').textContent = '';
         document.getElementById('modalProducer').textContent = '';
-        document.getElementById('modalCredit').textContent = 'Mixagem e masterização: Rony Silva';
-        document.getElementById('modalExtra').innerHTML = '';
+        document.getElementById('modalCredit').textContent = '';
+        const details = document.getElementById('modalStructured'); details.replaceChildren();
+        const addDetail = (label, value) => {
+          if (!value) return;
+          const line = document.createElement('div'); line.className = 'modal-detail';
+          const strong = document.createElement('strong'); strong.textContent = label + ': ';
+          const span = document.createElement('span'); span.textContent = value;
+          line.append(strong,span); details.append(line);
+        };
+        addDetail('Produção', project.producer);
+        addDetail('Mixagem e masterização', project.mix_master);
+        addDetail('Estúdio', project.studio);
+        const description = document.getElementById('modalDescription');
+        description.textContent = project.description || ''; description.style.display = project.description ? 'block' : 'none';
+        document.getElementById('modalExtra').replaceChildren();
         const link = document.getElementById('modalLink');
         link.href = audio; link.style.display = audio === '#' ? 'none' : 'inline';
-        link.textContent = 'OUVIR ↗';
+        link.textContent = kind === 'ALBUM' ? 'OUVIR ÁLBUM ↗' : 'OUVIR ↗';
         document.getElementById('workModal').showModal();
       };
       tile.addEventListener('click', open);
@@ -105,5 +128,5 @@ works.forEach(([year,song,artist,kind,img,producer,link,genre,extra])=>{
   }
 })();
 </script>
-<dialog id="workModal"><button class="close" aria-label="Fechar" onclick="this.closest('dialog').close()">×</button><div class="modal-year" id="modalYear"></div><h2 class="modal-title" id="modalSong"></h2><div class="modal-artist" id="modalArtist"></div><div class="modal-kind" id="modalKind"></div><p id="modalGenre" style="color:#aaa;font-size:12px;margin-top:10px"></p><p id="modalProducer" style="color:#aaa;font-size:12px;margin-top:18px"></p><p id="modalCredit" style="color:#aaa;font-size:12px;margin-top:10px"></p><div id="modalExtra"></div><p style="margin-top:22px"><a id="modalLink" href="#" target="_blank" rel="noopener" style="color:#d6c9a8;text-decoration:none;letter-spacing:.12em;font-size:11px">OUVIR NO YOUTUBE ↗</a></p></dialog>
+<dialog id="workModal"><button class="close" aria-label="Fechar" onclick="this.closest('dialog').close()">×</button><div class="modal-year" id="modalYear"></div><h2 class="modal-title" id="modalSong"></h2><div class="modal-artist" id="modalArtist"></div><div class="modal-kind" id="modalKind"></div><p id="modalGenre" style="color:#aaa;font-size:12px;margin-top:10px"></p><p id="modalProducer" style="color:#aaa;font-size:12px;margin-top:18px"></p><p id="modalCredit" style="color:#aaa;font-size:12px;margin-top:10px"></p><div id="modalStructured" class="modal-details"></div><p id="modalDescription" class="modal-description"></p><div id="modalExtra"></div><p style="margin-top:22px"><a id="modalLink" href="#" target="_blank" rel="noopener" style="color:#d6c9a8;text-decoration:none;letter-spacing:.12em;font-size:11px">OUVIR NO YOUTUBE ↗</a></p></dialog>
 </body></html>
