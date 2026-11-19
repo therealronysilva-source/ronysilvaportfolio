@@ -86,7 +86,7 @@ function renderProject(p){
 function renderLegacy(){for(const w of legacyWorks){const [year,title,artist,kind,image,producer,audio,genre,extra]=w;const extraValue=(label)=>extra?extra.filter(x=>x.toLowerCase().startsWith(label.toLowerCase()+':')).map(x=>x.slice(x.indexOf(':')+1).trim()).join('\n'):'';renderProject({title,artist,cover_url:image,release_year:Number(year),project_type:kind,producer, audio_url:audio,genre,mix_master:'Rony Silva',studio:extraValue('Estúdio'),guitar:extraValue('Violão'),project_direction:extraValue('Direção do projeto')});}}
 (async()=>{
  try{
-  const response=await fetch(`${SUPABASE_URL}/rest/v1/projects?select=*&order=created_at.asc`,{headers:{apikey:SUPABASE_KEY,Authorization:`Bearer ${SUPABASE_KEY}`}});
+  const response=await fetch(`${SUPABASE_URL}/rest/v1/projects?select=*&order=display_order.asc.nullslast,created_at.asc`,{headers:{apikey:SUPABASE_KEY,Authorization:`Bearer ${SUPABASE_KEY}`}});
   if(!response.ok)throw new Error('Supabase '+response.status);
   const projects=await response.json();
   const present=new Set(projects.map(p=>(p.title||'').trim().toLocaleLowerCase('pt-BR')));
